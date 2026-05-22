@@ -5,16 +5,31 @@ document.addEventListener('DOMContentLoaded', () => {
   const registerForm = document.getElementById('register-form');
   const feedback = document.getElementById('reg-feedback');
 
-  const api = {
-    books: '/api/books',
-    users: '/api/users'
-  };
+  // --- BASE DE DATOS LOCAL (Simulada en el Navegador) ---
+  
+  // Libros por defecto si la base de datos está vacía
+  const defaultBooks = [
+    { title: "Don Quijote de la Mancha", author: "Miguel de Cervantes", category: "Novela", status: "Disponible" },
+    { title: "Cien años de soledad", author: "Gabriel García Márquez", category: "Realismo Mágico", status: "Prestado" },
+    { title: "El Principito", author: "Antoine de Saint-Exupéry", category: "Infantil", status: "Disponible" },
+    { title: "Breves respuestas a las grandes preguntas", author: "Stephen Hawking", category: "Ciencia", status: "Disponible" }
+  ];
 
-  const fetchBooks = async () => {
+  // Inicializar almacenamiento local para libros y usuarios si no existen
+  if (!localStorage.getItem('local_books')) {
+    localStorage.setItem('local_books', JSON.stringify(defaultBooks));
+  }
+  if (!localStorage.getItem('local_users')) {
+    localStorage.setItem('local_users', JSON.stringify([]));
+  }
+
+  // --- FUNCIONES DE CARGA SIMULADAS ---
+
+  const fetchBooks = () => {
     try {
-      const res = await fetch(api.books);
-      const data = await res.json();
-      return data;
+      // Leemos los libros guardados en el navegador en vez de usar fetch
+      const data = JSON.parse(localStorage.getItem('local_books'));
+      return data || [];
     } catch (err) {
       console.error(err);
       return [];
@@ -24,10 +39,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const renderBooks = (books) => {
     const term = (searchInput.value || '').toLowerCase();
     const status = filterSelect.value;
+    
     const filtered = books.filter(b => {
       const searchable = [b.title, b.author, b.category].join(' ').toLowerCase();
       const matchTerm = searchable.includes(term);
-      const matchStatus = status === 'all' || b.status === status;
+      const matchStatus = status === 'all' || b.status.toLowerCase() === status.toLowerCase();
       return matchTerm && matchStatus;
     });
 
@@ -45,40 +61,58 @@ document.addEventListener('DOMContentLoaded', () => {
     `).join('');
   };
 
-  const loadAndRender = async () => {
+  const loadAndRender = () => {
     booksContainer.innerHTML = '<p class="placeholder">Cargando libros...</p>';
-    const books = await fetchBooks();
+    const books = fetchBooks();
     renderBooks(books);
   };
 
   searchInput.addEventListener('input', () => loadAndRender());
   filterSelect.addEventListener('change', () => loadAndRender());
 
-  registerForm.addEventListener('submit', async (e) => {
+  // --- FORMULARIO DE REGISTRO CORREGIDO ---
+
+  registerForm.addEventListener('submit', (e) => {
     e.preventDefault();
     feedback.textContent = '';
+    
     const name = document.getElementById('reg-name').value.trim();
     const email = document.getElementById('reg-email').value.trim();
     const role = document.getElementById('reg-role').value;
+    
     if (!name || !email) return;
+
     try {
-      const res = await fetch(api.users, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, role })
-      });
-      if (!res.ok) {
-        const err = await res.json();
-        feedback.textContent = err.error || 'Error al registrar.';
+      // 1. Obtener la lista actual de usuarios guardados en el navegador
+      let users = JSON.parse(localStorage.getItem('local_users')) || [];
+
+      // 2. Verificar si el correo ya está registrado para evitar duplicados
+      const existe = users.find(user => user.email === email);
+      if (existe) {
+        feedback.style.color = "var(--text-error, #ff4d4d)"; // Cambia al color de error de tu CSS
+        feedback.textContent = 'Este correo electrónico ya está registrado.';
         return;
       }
+
+      // 3. Crear el nuevo miembro y añadirlo a la lista
+      const nuevoUsuario = { name, email, role, date: new Date().toISOString() };
+      users.push(nuevoUsuario);
+
+      // 4. Guardar de vuelta la lista actualizada en el localStorage
+      localStorage.setItem('local_users', JSON.stringify(users));
+
+      // 5. Mostrar mensaje de éxito y limpiar formulario
+      feedback.style.color = "var(--text-success, #4dff4d)";
       feedback.textContent = 'Registro completado. ¡Bienvenido!';
       registerForm.reset();
+
     } catch (err) {
       console.error(err);
-      feedback.textContent = 'Error de conexión.';
+      feedback.style.color = "var(--text-error, #ff4d4d)";
+      feedback.textContent = 'Error al guardar los datos en el sistema local.';
     }
   });
 
+  // Carga inicial al abrir la página
   loadAndRender();
 });
