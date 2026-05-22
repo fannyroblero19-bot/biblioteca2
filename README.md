@@ -38,3 +38,7 @@ biblioteca-system/
 - Almacenamiento con SQLite
 - Conexión entre frontend y backend
 - Diseño oscuro moderno con sidebar lateral
+
+## Licencia
+
+Este proyecto se publica bajo la licencia MIT. Consulta el archivo `LICENSE` para más detalles.
