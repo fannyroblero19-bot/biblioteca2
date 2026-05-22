@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return await res.json();
     } catch (err) {
       console.warn('Falling back to static book data:', err.message);
-      const fallback = await fetch('/books.json');
+      const fallback = await fetch('books.json');
       if (fallback.ok) return await fallback.json();
       return [];
     }
