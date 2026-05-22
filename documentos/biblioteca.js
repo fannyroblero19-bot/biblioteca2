@@ -37,20 +37,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     booksContainer.innerHTML = filtered.map(b => `
-      <div style="display:flex;gap:12px;align-items:flex-start;padding:16px;border-bottom:1px solid rgba(255,255,255,0.04);">
-        <div style="width:100px;height:140px;border-radius:8px;overflow:hidden;background:rgba(255,255,255,0.03);flex-shrink:0;display:grid;place-items:center;">
-          ${b.cover_url ? `<img src="${b.cover_url}" alt="${b.title}" style="width:100%;height:100%;object-fit:cover;"/>` : '<div style="color:var(--text-muted);font-size:0.85rem;padding:8px;text-align:center;">Portada</div>'}
-        </div>
-        <div style="flex:1;">
-          <h4 style="margin:0 0 6px 0">${b.title}</h4>
-          <div style="color:var(--text-muted);font-size:0.9rem;margin-bottom:8px;">${b.author} — ${b.category} ${b.year ? '— ' + b.year : ''}</div>
-          ${b.description ? `<p style="margin:6px 0;color:var(--text-muted);">${b.description}</p>` : ''}
-          <div style="margin-top:8px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
-            <div>Estado: <span class="tag-pill ${b.status.toLowerCase()}">${b.status}</span></div>
-            ${b.isbn ? `<div style="color:var(--text-muted)">ISBN: ${b.isbn}</div>` : ''}
-            ${b.publisher ? `<div style="color:var(--text-muted)">Editorial: ${b.publisher}</div>` : ''}
-          </div>
-        </div>
+      <div style="padding:12px;border-bottom:1px solid rgba(255,255,255,0.04);">
+        <h4 style="margin:0 0 6px 0">${b.title}</h4>
+        <div style="color:var(--text-muted);font-size:0.9rem">${b.author} — ${b.category}</div>
+        <div style="margin-top:8px">Estado: <span class="tag-pill ${b.status.toLowerCase()}">${b.status}</span></div>
       </div>
     `).join('');
   };
