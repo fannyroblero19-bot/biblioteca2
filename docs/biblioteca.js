@@ -4,11 +4,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const filterSelect = document.getElementById('book-filter');
   const registerForm = document.getElementById('register-form');
   const feedback = document.getElementById('reg-feedback');
+  const addBookButton = document.getElementById('btn-add-book');
+  const addBookCard = document.getElementById('add-book-card');
+  const addBookForm = document.getElementById('add-book-form');
+  const addBookFeedback = document.getElementById('add-book-feedback');
 
   const api = {
     books: '/api/books',
     users: '/api/users'
   };
+
+  const STORAGE_KEY = 'biblioteca2-added-books';
 
   const fetchBooks = async () => {
     try {
@@ -21,6 +27,35 @@ document.addEventListener('DOMContentLoaded', () => {
       if (fallback.ok) return await fallback.json();
       return [];
     }
+  };
+
+  const getStoredBooks = () => {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    } catch {
+      return [];
+    }
+  };
+
+  const saveStoredBooks = (books) => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(books));
+  };
+
+  const storeBookLocally = (book) => {
+    const current = getStoredBooks();
+    const nextId = current.length ? Math.max(...current.map(b => b.id)) + 1 : 1000;
+    const newBook = {
+      id: nextId,
+      created_at: new Date().toISOString(),
+      ...book
+    };
+    current.unshift(newBook);
+    saveStoredBooks(current);
+    return newBook;
+  };
+
+  const mergeBooks = (books) => {
+    return [...getStoredBooks(), ...books];
   };
 
   const renderBooks = (books) => {
@@ -60,11 +95,76 @@ document.addEventListener('DOMContentLoaded', () => {
   const loadAndRender = async () => {
     booksContainer.innerHTML = '<p class="placeholder">Cargando libros...</p>';
     const books = await fetchBooks();
-    renderBooks(books);
+    renderBooks(mergeBooks(books));
+  };
+
+  const toggleAddBookCard = () => {
+    if (!addBookCard) return;
+    addBookCard.classList.toggle('hidden');
+  };
+
+  const addBook = async (bookData) => {
+    try {
+      const res = await fetch(api.books, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bookData)
+      });
+      if (res.ok) {
+        return await res.json();
+      }
+      throw new Error('API no disponible');
+    } catch {
+      return storeBookLocally(bookData);
+    }
   };
 
   searchInput.addEventListener('input', () => loadAndRender());
   filterSelect.addEventListener('change', () => loadAndRender());
+
+  if (addBookButton) {
+    addBookButton.addEventListener('click', () => {
+      toggleAddBookCard();
+    });
+  }
+
+  if (addBookForm) {
+    addBookForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      addBookFeedback.textContent = '';
+      const title = document.getElementById('book-title').value.trim();
+      const author = document.getElementById('book-author').value.trim();
+      const category = document.getElementById('book-category').value.trim();
+      const status = document.getElementById('book-status').value;
+      const year = Number(document.getElementById('book-year').value) || undefined;
+      const isbn = document.getElementById('book-isbn').value.trim();
+      const publisher = document.getElementById('book-publisher').value.trim();
+      const cover_url = document.getElementById('book-cover-url').value.trim();
+      const description = document.getElementById('book-description').value.trim();
+
+      if (!title || !author || !category) {
+        addBookFeedback.textContent = 'Por favor completa título, autor y categoría.';
+        return;
+      }
+
+      const bookData = {
+        title,
+        author,
+        category,
+        status,
+        year,
+        isbn,
+        publisher,
+        cover_url,
+        description
+      };
+
+      const savedBook = await addBook(bookData);
+      addBookFeedback.textContent = savedBook.id >= 1000 ? 'Libro agregado localmente.' : 'Libro agregado correctamente.';
+      addBookForm.reset();
+      loadAndRender();
+    });
+  }
 
   registerForm.addEventListener('submit', async (e) => {
     e.preventDefault();

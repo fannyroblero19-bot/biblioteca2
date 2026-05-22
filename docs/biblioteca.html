@@ -15,9 +15,12 @@
           <h2>Biblioteca Pública</h2>
           <p>Explora los libros disponibles y regístrate como miembro.</p>
         </div>
-        <nav>
-          <a href="index.html" style="color:var(--text-muted);">Ir al Panel</a>
-        </nav>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <button id="btn-add-book" class="save-btn" type="button">Agregar libro</button>
+          <nav>
+            <a href="index.html" style="color:var(--text-muted);">Ir al Panel</a>
+          </nav>
+        </div>
       </header>
 
       <section style="display:grid;grid-template-columns: 1fr 320px;gap:24px;align-items:start;">
@@ -59,6 +62,55 @@
               <button class="save-btn" type="submit">Registrarme</button>
             </form>
             <div id="reg-feedback" style="margin-top:12px;color:var(--text-muted);"></div>
+          </div>
+
+          <div id="add-book-card" class="workspace-card hidden" style="margin-top:16px;">
+            <div class="workspace-title">
+              <h3>Agregar libro</h3>
+            </div>
+            <form id="add-book-form" style="margin-top:12px;">
+              <div class="field-row">
+                <label for="book-title">Título</label>
+                <input id="book-title" type="text" required />
+              </div>
+              <div class="field-row">
+                <label for="book-author">Autor</label>
+                <input id="book-author" type="text" required />
+              </div>
+              <div class="field-row">
+                <label for="book-category">Categoría</label>
+                <input id="book-category" type="text" required />
+              </div>
+              <div class="field-row">
+                <label for="book-status">Estado</label>
+                <select id="book-status">
+                  <option value="Disponible">Disponible</option>
+                  <option value="Prestado">Prestado</option>
+                </select>
+              </div>
+              <div class="field-row">
+                <label for="book-year">Año</label>
+                <input id="book-year" type="number" min="0" />
+              </div>
+              <div class="field-row">
+                <label for="book-isbn">ISBN</label>
+                <input id="book-isbn" type="text" />
+              </div>
+              <div class="field-row">
+                <label for="book-publisher">Editorial</label>
+                <input id="book-publisher" type="text" />
+              </div>
+              <div class="field-row">
+                <label for="book-cover-url">URL portada</label>
+                <input id="book-cover-url" type="url" placeholder="https://..." />
+              </div>
+              <div class="field-row">
+                <label for="book-description">Descripción</label>
+                <textarea id="book-description" rows="3" style="width:100%;border-radius:12px;border:1px solid var(--border);background:transparent;color:var(--text-main);padding:10px"></textarea>
+              </div>
+              <button class="save-btn" type="submit">Guardar libro</button>
+            </form>
+            <div id="add-book-feedback" style="margin-top:12px;color:var(--text-muted);"></div>
           </div>
         </aside>
       </section>
