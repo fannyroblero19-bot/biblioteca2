@@ -32,6 +32,18 @@
   const fieldFourRow = document.getElementById('field-four-row');
   const fieldFour = document.getElementById('field-four');
   const fieldThreeRow = document.getElementById('field-three-row');
+  const fieldDescRow = document.getElementById('field-desc-row');
+  const fieldIsbnRow = document.getElementById('field-isbn-row');
+  const fieldYearRow = document.getElementById('field-year-row');
+  const fieldPubRow = document.getElementById('field-pub-row');
+  const fieldCoverRow = document.getElementById('field-cover-row');
+  const fieldDesc = document.getElementById('field-desc');
+  const fieldIsbn = document.getElementById('field-isbn');
+  const fieldYear = document.getElementById('field-year');
+  const fieldPublisher = document.getElementById('field-publisher');
+  const fieldCover = document.getElementById('field-cover');
+  const fieldCoverFileRow = document.getElementById('field-cover-file-row');
+  const fieldCoverFile = document.getElementById('field-cover-file');
 
   const api = {
     books: '/api/books',
@@ -140,13 +152,26 @@
     state.recordMode = type;
     state.activeRecord = record;
     formModal.classList.remove('hidden');
-    fieldFourRow.classList.toggle('hidden', type !== 'book');
-    fieldThreeRow.querySelector('label').textContent = type === 'book' ? 'Categoría' : 'Rol';
+    const isBook = type === 'book';
+    fieldFourRow.classList.toggle('hidden', !isBook);
+    fieldThreeRow.querySelector('label').textContent = isBook ? 'Categoría' : 'Rol';
+    fieldDescRow.classList.toggle('hidden', !isBook);
+    fieldIsbnRow.classList.toggle('hidden', !isBook);
+    fieldYearRow.classList.toggle('hidden', !isBook);
+    fieldPubRow.classList.toggle('hidden', !isBook);
+    fieldCoverRow.classList.toggle('hidden', !isBook);
     modalHeading.textContent = record ? `Editar ${type === 'book' ? 'libro' : 'usuario'}` : `Agregar ${type === 'book' ? 'libro' : 'usuario'}`;
     fieldOne.value = record ? (type === 'book' ? record.title : record.name) : '';
     fieldTwo.value = record ? (type === 'book' ? record.author : record.email) : '';
     fieldThree.value = record ? (type === 'book' ? record.category : record.role) : '';
     fieldFour.value = record ? record.status : 'Disponible';
+    fieldDesc.value = record && record.description ? record.description : '';
+    fieldIsbn.value = record && record.isbn ? record.isbn : '';
+    fieldYear.value = record && record.year ? record.year : '';
+    fieldPublisher.value = record && record.publisher ? record.publisher : '';
+    fieldCover.value = record && record.cover_url ? record.cover_url : '';
+    fieldCoverFile.value = '';
+    fieldCoverFileRow.classList.toggle('hidden', !isBook);
   };
 
   const closeForm = () => {
@@ -162,6 +187,11 @@
       author: fieldTwo.value.trim(),
       category: fieldThree.value.trim(),
       status: fieldFour.value,
+      description: fieldDesc.value.trim(),
+      isbn: fieldIsbn.value.trim(),
+      year: fieldYear.value ? Number(fieldYear.value) : null,
+      publisher: fieldPublisher.value.trim(),
+      cover_url: fieldCover.value.trim(),
       name: fieldOne.value.trim(),
       email: fieldTwo.value.trim(),
       role: fieldThree.value.trim()
@@ -169,12 +199,32 @@
 
     if (state.recordMode === 'book') {
       const endpoint = state.activeRecord ? `${api.books}/${state.activeRecord.id}` : api.books;
-      await postData(endpoint, {
-        title: payload.title,
-        author: payload.author,
-        category: payload.category,
-        status: payload.status
-      }, state.activeRecord ? 'PUT' : 'POST');
+      // If a file is selected, send multipart/form-data
+      if (fieldCoverFile && fieldCoverFile.files && fieldCoverFile.files.length) {
+        const form = new FormData();
+        form.append('title', payload.title);
+        form.append('author', payload.author);
+        form.append('category', payload.category);
+        form.append('status', payload.status);
+        form.append('description', payload.description || '');
+        form.append('isbn', payload.isbn || '');
+        if (payload.year) form.append('year', payload.year);
+        form.append('publisher', payload.publisher || '');
+        form.append('cover_file', fieldCoverFile.files[0]);
+        await fetch(endpoint, { method: state.activeRecord ? 'PUT' : 'POST', body: form });
+      } else {
+        await postData(endpoint, {
+          title: payload.title,
+          author: payload.author,
+          category: payload.category,
+          status: payload.status,
+          description: payload.description,
+          isbn: payload.isbn,
+          year: payload.year,
+          publisher: payload.publisher,
+          cover_url: payload.cover_url
+        }, state.activeRecord ? 'PUT' : 'POST');
+      }
     } else {
       const endpoint = state.activeRecord ? `${api.users}/${state.activeRecord.id}` : api.users;
       await postData(endpoint, {

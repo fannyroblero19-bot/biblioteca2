@@ -22,6 +22,23 @@ const initialize = () => {
       )
     `);
 
+    // Ensure additional columns exist for richer book metadata
+    const ensureColumn = (table, column, definition) => {
+      db.all(`PRAGMA table_info(${table})`, [], (err, rows) => {
+        if (err) return;
+        const exists = rows.some(r => r.name === column);
+        if (!exists) {
+          db.run(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
+        }
+      });
+    };
+
+    ensureColumn('books', 'description', 'TEXT DEFAULT ""');
+    ensureColumn('books', 'isbn', 'TEXT DEFAULT ""');
+    ensureColumn('books', 'year', 'INTEGER DEFAULT NULL');
+    ensureColumn('books', 'publisher', 'TEXT DEFAULT ""');
+    ensureColumn('books', 'cover_url', 'TEXT DEFAULT ""');
+
     db.run(`
       CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,

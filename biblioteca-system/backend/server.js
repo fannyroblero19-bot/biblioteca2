@@ -9,13 +9,15 @@ const PORT = process.env.PORT || 4000;
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '..', 'frontend')));
+
+// Servir archivos estáticos desde la carpeta documentos en la raíz del repo
+app.use(express.static(path.join(__dirname, '..', '..', 'documentos')));
 
 app.use('/api/books', booksRoute);
 app.use('/api/users', usersRoute);
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'frontend', 'index.html'));
+  res.sendFile(path.join(__dirname, '..', '..', 'documentos', 'index.html'));
 });
 
 app.listen(PORT, () => {
