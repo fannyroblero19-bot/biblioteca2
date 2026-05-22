@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Biblioteca System</title>
+  <link rel="stylesheet" href="style.css" />
+  <script defer src="script.js"></script>
+</head>
+<body>
+  <div class="layout-root">
+    <aside class="nav-panel">
+      <div class="brand-block">
+        <div class="logo-circle">B</div>
+        <div>
+          <h1>Biblioteca</h1>
+          <p>System</p>
+        </div>
+      </div>
+
+      <nav class="nav-list">
+        <button class="nav-link active" data-view="overview">Overview</button>
+        <button class="nav-link" data-view="books">Libros</button>
+        <button class="nav-link" data-view="members">Usuarios</button>
+      </nav>
+
+      <div class="nav-footer">
+        <span>Modo nocturno</span>
+        <div class="status-dot"></div>
+      </div>
+    </aside>
+
+    <main class="main-panel">
+      <header class="top-panel">
+        <div>
+          <h2>Panel de control</h2>
+          <p>Administra tu biblioteca con estilo minimalista y oscuro.</p>
+        </div>
+        <div class="user-chip">Admin</div>
+      </header>
+
+      <section class="page-view" id="overview">
+        <div class="hero-grid">
+          <article class="info-card accent-card">
+            <div class="icon-box">📚</div>
+            <div>
+              <h3 id="dashboard-books">0</h3>
+              <p>Libros registrados</p>
+            </div>
+          </article>
+          <article class="info-card contrast-card">
+            <div class="icon-box">👥</div>
+            <div>
+              <h3 id="dashboard-users">0</h3>
+              <p>Usuarios activos</p>
+            </div>
+          </article>
+          <article class="info-card dark-card">
+            <div class="icon-box">🔥</div>
+            <div>
+              <h3 id="dashboard-flow">0</h3>
+              <p>Registros recientes</p>
+            </div>
+          </article>
+        </div>
+
+        <div class="workspace-card">
+          <div class="workspace-title">
+            <h3>Actividad rápida</h3>
+            <span>Últimas operaciones</span>
+          </div>
+          <div class="workspace-content" id="overview-list">
+            <p class="placeholder">Sin actividad todavía.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="page-view hidden" id="books">
+        <div class="section-header">
+          <div>
+            <h3>Gestión de libros</h3>
+            <p>Administra el stock disponible y los estados.</p>
+          </div>
+          <button class="action-btn" id="btn-new-book">Agregar libro</button>
+        </div>
+
+        <div class="table-frame">
+          <div class="table-tools">
+            <input id="books-filter" type="search" placeholder="Buscar por título, autor o categoría" />
+            <select id="books-status">
+              <option value="all">Todos</option>
+              <option value="Disponible">Disponible</option>
+              <option value="Prestado">Prestado</option>
+            </select>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Título</th>
+                <th>Autor</th>
+                <th>Categoría</th>
+                <th>Estado</th>
+                <th>Acción</th>
+              </tr>
+            </thead>
+            <tbody id="books-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="page-view hidden" id="members">
+        <div class="section-header">
+          <div>
+            <h3>Usuarios</h3>
+            <p>Registra nuevos miembros o actualiza información.</p>
+          </div>
+          <button class="action-btn" id="btn-new-user">Agregar usuario</button>
+        </div>
+
+        <div class="table-frame">
+          <div class="table-tools">
+            <input id="users-filter" type="search" placeholder="Buscar nombre, email o rol" />
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Email</th>
+                <th>Rol</th>
+                <th>Ingreso</th>
+                <th>Acción</th>
+              </tr>
+            </thead>
+            <tbody id="users-body"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop hidden" id="form-modal">
+    <div class="modal-window">
+      <button class="close-x" id="close-modal">×</button>
+      <h3 id="modal-heading">Formulario</h3>
+      <form id="record-form">
+        <div class="field-row">
+          <label for="field-one">Campo 1</label>
+          <input id="field-one" type="text" required />
+        </div>
+        <div class="field-row">
+          <label for="field-two">Campo 2</label>
+          <input id="field-two" type="text" required />
+        </div>
+        <div class="field-row" id="field-three-row">
+          <label for="field-three">Campo 3</label>
+          <input id="field-three" type="text" required />
+        </div>
+        <div class="field-row hidden" id="field-four-row">
+          <label for="field-four">Estado</label>
+          <select id="field-four">
+            <option value="Disponible">Disponible</option>
+            <option value="Prestado">Prestado</option>
+            <option value="Reservado">Reservado</option>
+          </select>
+        </div>
+        <button class="save-btn" type="submit">Guardar</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>
